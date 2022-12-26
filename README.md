@@ -1,5 +1,7 @@
 # dns2snort
 
+[![Code Style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
+
 Given a file containing a list of fully qualified DNS domains, generate Snort rules for those domains. Incredibly useful if you are sitting on top of a pile of IOCs, but want an efficiently lazy way to generate Snort signatures for them.
 
 ### Kudos
