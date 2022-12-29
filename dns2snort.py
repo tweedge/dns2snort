@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import argparse
+from idstools import rule
 
 description = """Given a file containing a list of FQDNs, quickly generate Snort rules for those domains.\n
 Brought to you by @da_667, @botnet_hunter, @3XPlo1T2, and tweedge."""
@@ -70,13 +71,21 @@ for line in domains_in_file:
         if len(segment_len_hex) == 1:
             segment_len_hex = "0%s" % segment_len_hex
         content += f"|{segment_len_hex.upper()}|{segment}"
+    content = f'"{content}|00|"'
 
-    filter = "alert udp $HOME_NET any -> $EXTERNAL_NET 53"
-    message = f'msg:"BLACKLIST DNS domain {domain}";'
-    detect = f'flow:to_server; byte_test:1,!&,0xF8,2; content:"{content}|00|"; fast_pattern:only;'
+    filter = "alert udp $HOME_NET any -> any 53"
+    message = f'msg:"dns2snort banned DNS domain {domain}";'
+    dns_queries_only = 'content:"|01|"; offset:2; depth:1; content:"|00 01 00 00 00 00 00|"; distance:1; within:7;'
+    detect = f'content:{content}; nocase; distance:0; fast_pattern;'
     metadata = f"metadata:service dns; sid:{sid}; rev:1;"
 
-    rule = f"{filter} ({message} {detect} {metadata})\n"
-    rules_out_file.write(rule)
+    rule_string = f"{filter} ({message} {dns_queries_only} {detect} {metadata})\n"
+    parsed_rule = rule.parse(rule_string)
+    if parsed_rule.content == content:
+        rules_out_file.write(rule_string)
+    else:
+        print("idstools detected different content than what was expected, skipping")
+        print(f"Expected: {content}")
+        print(f"Received: {parsed_rule.content}")
 
     sid += 1

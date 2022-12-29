@@ -40,3 +40,4 @@ These are all properly formatted Snort rules ready to be pushed to a sensor.
 * Some additional changes have been made from da_667's version of dns2snort, these are:
   * The subdomain limitation has been removed.
   * There is no longer an argument to allow removing `www.` from domains.
+  * `idstools` now does a basic check on the validity of the produced rule
