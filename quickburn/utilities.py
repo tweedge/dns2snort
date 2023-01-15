@@ -7,12 +7,19 @@ def get_domain_segments(domain):
 
     return segments
 
-def build_message(default_message, custom_message, domain):
-    message = default_message
-
+def build_message(custom_message, found_where, domain):
     if custom_message:
-        message = custom_message
+        message = f"Observed {custom_message}"
+    else:
+        message = "Banned"
 
     et_format_domain = " .".join(get_domain_segments(domain))
 
-    return f'msg:"{message} ({et_format_domain})";'
+    return f'msg:"{message} ({et_format_domain}) in {found_where}";'
+
+def build_reference(reference):
+    ref = ""
+    if reference:
+        reference_without_proto = reference.replace("https://", "")
+        ref = f"reference:url,{reference_without_proto}; "
+    return ref
