@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 import argparse
-from quickburn.snort import snort_dns, snort_tls_sni
-from quickburn.suricata4 import suricata4_dns, suricata4_tls_sni
-from quickburn.suricata5 import suricata5_dns, suricata5_tls_sni
+from quickburn.snort import snort_dns_query, snort_tls_sni
+from quickburn.suricata4 import suricata4_dns_query, suricata4_tls_sni
+from quickburn.suricata5 import suricata5_dns_query, suricata5_tls_sni
 
 description = """Given a file containing a list of FQDNs, quickly generate Snort rules for those domains.\n
 Brought to you by @da_667, @botnet_hunter, @3XPlo1T2, and tweedge."""

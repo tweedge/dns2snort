@@ -1,7 +1,7 @@
 from quickburn.utilities import get_domain_segments, build_message, build_reference
 
 
-def suricata4_dns(domain, sid, custom_message, reference):
+def suricata4_dns_query(domain, sid, custom_message, reference):
     segments = get_domain_segments(domain)
     detect_domain = ".".join(segments)
 
@@ -23,6 +23,24 @@ def suricata4_dns(domain, sid, custom_message, reference):
     return rule_string
 
 
+def suricata4_http_host(domain, sid, custom_message, reference):
+    segments = get_domain_segments(domain)
+    detect_domain = "." + ".".join(segments)  # dot prefixed
+
+    # inject any custom metadata
+    message = build_message(custom_message, "HTTP Host", domain)
+    ref = build_reference(reference)
+
+    # construct the rule
+    analyze = "alert http $HOME_NET any -> $EXTERNAL_NET any"
+    filter = "flow:established,to_server;"
+    detect = f'content:"{detect_domain}"; http_host; isdataat:!1,relative;'
+    metadata = f"sid:{sid}; {ref}rev:1;"
+
+    rule_string = f"{analyze} ({message} {filter} {detect} {metadata})\n"
+    return rule_string
+
+
 def suricata4_tls_sni(domain, sid, custom_message, reference):
     segments = get_domain_segments(domain)
     detect_domain = ".".join(segments)
@@ -34,7 +52,9 @@ def suricata4_tls_sni(domain, sid, custom_message, reference):
     # construct the rule
     analyze = "alert tls $HOME_NET any -> $EXTERNAL_NET any"
     filter = "flow:established,to_server; tls_sni;"
-    detect = f'content:"{detect_domain}"; depth:{len(detect_domain)}; isdataat:!1,relative;'
+    detect = (
+        f'content:"{detect_domain}"; depth:{len(detect_domain)}; isdataat:!1,relative;'
+    )
     metadata = f"sid:{sid}; {ref}rev:1;"
 
     rule_string = f"{analyze} ({message} {filter} {detect} {metadata})\n"

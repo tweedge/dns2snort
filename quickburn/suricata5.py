@@ -1,9 +1,9 @@
 from quickburn.utilities import get_domain_segments, build_message, build_reference
 
 
-def suricata5_dns(domain, sid, custom_message, reference):
+def suricata5_dns_query(domain, sid, custom_message, reference):
     segments = get_domain_segments(domain)
-    detect_domain = "." + ".".join(segments)
+    detect_domain = "." + ".".join(segments)  # dot prefixed
 
     # inject any custom metadata
     message = build_message(custom_message, "DNS Query", domain)
@@ -15,6 +15,24 @@ def suricata5_dns(domain, sid, custom_message, reference):
     metadata = f"sid:{sid}; {ref}rev:1;"
 
     rule_string = f"{analyze} ({message} {detect} {metadata})\n"
+    return rule_string
+
+
+def suricata5_http_host(domain, sid, custom_message, reference):
+    segments = get_domain_segments(domain)
+    detect_domain = "." + ".".join(segments)  # dot prefixed
+
+    # inject any custom metadata
+    message = build_message(custom_message, "HTTP Host", domain)
+    ref = build_reference(reference)
+
+    # construct the rule
+    analyze = "alert http $HOME_NET any -> $EXTERNAL_NET any"
+    filter = "flow:established,to_server; http.host;"
+    detect = f'content:"{detect_domain}"; endswith;'
+    metadata = f"sid:{sid}; {ref}rev:1;"
+
+    rule_string = f"{analyze} ({message} {filter} {detect} {metadata})\n"
     return rule_string
 
 

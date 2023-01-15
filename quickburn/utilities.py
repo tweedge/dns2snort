@@ -7,6 +7,7 @@ def get_domain_segments(domain):
 
     return segments
 
+
 def build_message(custom_message, found_where, domain):
     if custom_message:
         message = f"Observed {custom_message}"
@@ -16,6 +17,7 @@ def build_message(custom_message, found_where, domain):
     et_format_domain = " .".join(get_domain_segments(domain))
 
     return f'msg:"{message} ({et_format_domain}) in {found_where}";'
+
 
 def build_reference(reference):
     ref = ""

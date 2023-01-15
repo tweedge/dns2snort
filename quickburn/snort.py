@@ -1,7 +1,7 @@
 from quickburn.utilities import get_domain_segments, build_message, build_reference
 
 
-def snort_dns(domain, sid, custom_message, reference):
+def snort_dns_query(domain, sid, custom_message, reference):
     segments = get_domain_segments(domain)
     content = ""
 
@@ -25,6 +25,29 @@ def snort_dns(domain, sid, custom_message, reference):
     rule_string = f"{analyze} ({message} {filter} {detect} {metadata})\n"
     return rule_string
 
+
+def snort_http_host(domain, sid, custom_message, reference):
+    segments = get_domain_segments(domain)
+    detect_domain = "." + ".".join(segments)  # dot prefixed
+
+    subdomains_regex = "/^Host\\x3a\\x20[^\\r\\n]+"
+    subdomains_regex += detect_domain.replace("-", "\\-").replace(".", "\\.")
+    subdomains_regex += "[\\r\\n]+$/Hmi"
+
+    # inject any custom metadata
+    message = build_message(custom_message, "TLS SNI", domain)
+    ref = build_reference(reference)
+
+    # construct the rule
+    analyze = "alert tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS"
+    detect = f'flow:established,to_server; content:"{detect_domain}|0d 0a|"; http_header; fast_pattern;'
+    and_subdomains = f'pcre:"{subdomains_regex}";'
+    metadata = f"sid:{sid}; {ref}rev:1;"
+
+    rule_string = f"{analyze} ({message} {detect} {and_subdomains} {metadata})\n"
+    return rule_string
+
+
 def snort_tls_sni(domain, sid, custom_message, reference):
     segments = get_domain_segments(domain)
     detect_domain = ".".join(segments)
@@ -41,9 +64,10 @@ def snort_tls_sni(domain, sid, custom_message, reference):
     # construct the rule
     analyze = "alert tcp $HOME_NET any -> $EXTERNAL_NET 443"
     filter = 'flow:established,to_server; content:"|16|"; content:"|01|"; within:8;'
-    detect = f'content:"|00 00 {length_as_hex}|{detect_domain}"; distance:0; fast_pattern;'
+    detect = (
+        f'content:"|00 00 {length_as_hex}|{detect_domain}"; distance:0; fast_pattern;'
+    )
     metadata = f"sid:{sid}; {ref}rev:1;"
 
     rule_string = f"{analyze} ({message} {filter} {detect} {metadata})\n"
     return rule_string
-
