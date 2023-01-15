@@ -1,4 +1,4 @@
-# dns2snort
+# quickburn
 
 [![Code Style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
 
@@ -6,7 +6,7 @@ Given a file containing a list of fully qualified DNS domains, generate Snort ru
 
 ### Kudos
 
-This project is originally by [da_667](https://github.com/da667), with contributions from @botnet_hunter, and @3XPlo1T2.
+This project is originally by [da667](https://github.com/da667), with contributions from @botnet_hunter, and @3XPlo1T2.
 
 ### Example
 

@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 import argparse
-from idstools import rule
+from quickburn.snort import snort_dns
+from quickburn.suricata4 import suricata4_dns
+from quickburn.suricata5 import suricata5_dns
 
 description = """Given a file containing a list of FQDNs, quickly generate Snort rules for those domains.\n
 Brought to you by @da_667, @botnet_hunter, @3XPlo1T2, and tweedge."""
@@ -8,33 +10,28 @@ Brought to you by @da_667, @botnet_hunter, @3XPlo1T2, and tweedge."""
 parser = argparse.ArgumentParser(description=description)
 
 parser.add_argument(
-    "-i",
-    dest="infile",
+    "--input",
     required=True,
     help="The name of the file containing a list of domains, one domain per line.",
 )
 parser.add_argument(
-    "-o",
-    dest="outfile",
+    "--output",
     required=True,
     help="The name of the file to output your Snort rules to.",
 )
 parser.add_argument(
-    "-s",
-    dest="sid",
+    "--sid",
     type=int,
     required=True,
     help="The Snort SID to start numbering incrementally at. This number should be between 1000000 and 2000000.",
 )
 parser.add_argument(
-    "-m",
-    dest="message",
+    "--message",
     type=str,
     help="Optional: A custom message to include in the rule",
 )
 parser.add_argument(
-    "-u",
-    dest="reference",
+    "--reference",
     type=str,
     help="Optional: A reference URL to include in the rule",
 )
@@ -60,8 +57,8 @@ if why_failed:
 # The hexidecmal letter is converted to upper case, and the rule is written to a file.
 # after the rule is written the SID number is incremented by 1 for the next rule.
 
-rules_out_file = open(args.outfile, "w")
-domains_in_file = open(args.infile, "r")
+rules_out_file = open(args.output, "w")
+domains_in_file = open(args.input, "r")
 sid = args.sid
 
 for line in domains_in_file:
@@ -71,47 +68,8 @@ for line in domains_in_file:
     if domain == "":
         continue
 
-    segments = domain.split(".")
+    rule_string = snort_dns(domain, sid, args.message, args.reference)
 
-    # remove blank strings in index 0 (ex. where ".tld" is split into ["", "tld"])
-    if segments[0] == "":
-        segments = segments[1:]
-
-    content = ""
-    for segment in segments:
-        segment_len_hex = hex(len(segment))[2:]
-        if len(segment_len_hex) == 1:
-            segment_len_hex = "0%s" % segment_len_hex
-        content += f"|{segment_len_hex}|{segment}"
-    content = f'"{content}|00|"'
-
-    # inject any custom metadata
-    message = f'msg:"dns2snort banned DNS domain {domain}";'
-    if args.message:
-        arg_message = args.message
-        if "{domain}" in arg_message:
-            imploded_domain = " .".join(segments)
-            arg_message = arg_message.replace("{domain}", imploded_domain)
-        message = f'msg:"{arg_message}";'
-
-    ref = ""
-    if args.reference:
-        arg_ref = args.reference.replace("https://", "")
-        ref = f"reference:url,{arg_ref}; "
-
-    # construct the rule
-    filter = "alert udp $HOME_NET any -> any 53"
-    dns_queries_only = 'content:"|01|"; offset:2; depth:1; content:"|00 01 00 00 00 00 00|"; distance:1; within:7;'
-    detect = f'content:{content}; nocase; distance:0; fast_pattern;'
-    metadata = f"metadata:service dns; sid:{sid}; {ref}rev:1;"
-
-    rule_string = f"{filter} ({message} {dns_queries_only} {detect} {metadata})\n"
-    parsed_rule = rule.parse(rule_string)
-    if parsed_rule.content == content:
-        rules_out_file.write(rule_string)
-    else:
-        print("idstools detected different content than what was expected, skipping")
-        print(f"Expected: {content}")
-        print(f"Received: {parsed_rule.content}")
+    rules_out_file.write(rule_string)
 
     sid += 1
