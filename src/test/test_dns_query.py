@@ -21,7 +21,7 @@ def test_suricata4_dns_query():
     generated_rule = suricata4_dns_query(domain, sid, message, reference)
     assert (
         generated_rule.strip()
-        == 'alert dns $HOME_NET any -> any any (msg:"Observed ViperSoftX CnC (privatproxy-blog .xyz) in DNS Query"; dns_query; content:"privatproxy-blog.xyz"; nocase; isdataat:!1,relative; pcre:"/(?:^|\.)privatproxy\-blog\.xyz$/"; reference:url,chris.partridge.tech/2022/evolution-of-vipersoftx-dga/; sid:2043105; rev:1;)'
+        == 'alert dns $HOME_NET any -> any any (msg:"Observed ViperSoftX CnC (privatproxy-blog .xyz) in DNS Query"; dns_query; content:"privatproxy-blog.xyz"; nocase; isdataat:!1,relative; pcre:"/(?:^|\\.)privatproxy\\-blog\\.xyz$/"; reference:url,chris.partridge.tech/2022/evolution-of-vipersoftx-dga/; sid:2043105; rev:1;)'
     )
 
 
