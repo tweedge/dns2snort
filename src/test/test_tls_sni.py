@@ -1,6 +1,6 @@
-from ..snort import snort_tls_sni
-from ..suricata4 import suricata4_tls_sni
-from ..suricata5 import suricata5_tls_sni
+from src.snort import snort_tls_sni
+from src.suricata4 import suricata4_tls_sni
+from src.suricata5 import suricata5_tls_sni
 
 
 domain = "letsmakeparty3.ga"
