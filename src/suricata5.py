@@ -1,4 +1,4 @@
-from quickburn.utilities import get_domain_segments, build_message, build_reference
+from src.utilities import get_domain_segments, build_message, build_reference
 
 
 def suricata5_dns_query(domain, sid, custom_message, reference):
@@ -12,7 +12,7 @@ def suricata5_dns_query(domain, sid, custom_message, reference):
     # construct the rule
     analyze = "alert dns $HOME_NET any -> any any"
     detect = f'dns.query; dotprefix; content:"{detect_domain}"; nocase; endswith;'
-    metadata = f"sid:{sid}; {ref}rev:1;"
+    metadata = f"{ref}sid:{sid}; rev:1;"
 
     rule_string = f"{analyze} ({message} {detect} {metadata})\n"
     return rule_string
@@ -30,7 +30,7 @@ def suricata5_http_host(domain, sid, custom_message, reference):
     analyze = "alert http $HOME_NET any -> $EXTERNAL_NET any"
     filter = "flow:established,to_server; http.host;"
     detect = f'content:"{detect_domain}"; endswith;'
-    metadata = f"sid:{sid}; {ref}rev:1;"
+    metadata = f"{ref}sid:{sid}; rev:1;"
 
     rule_string = f"{analyze} ({message} {filter} {detect} {metadata})\n"
     return rule_string
@@ -48,7 +48,7 @@ def suricata5_tls_sni(domain, sid, custom_message, reference):
     analyze = "alert tls $HOME_NET any -> $EXTERNAL_NET any"
     filter = "flow:established,to_server; tls.sni;"
     detect = f'content:"{detect_domain}"; bsize:{len(detect_domain)}; fast_pattern;'
-    metadata = f"sid:{sid}; {ref}rev:1;"
+    metadata = f"{ref}sid:{sid}; rev:1;"
 
-    rule_string = f"{analyze} ({message} {filter} {detect} {metadata})\n"
+    rule_string = f"{analyze} ({message} {filter} {detect} {metadata})"
     return rule_string

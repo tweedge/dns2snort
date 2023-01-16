@@ -1,4 +1,4 @@
-from quickburn.utilities import get_domain_segments, build_message, build_reference
+from src.utilities import get_domain_segments, build_message, build_reference
 
 
 def suricata4_dns_query(domain, sid, custom_message, reference):
@@ -17,7 +17,7 @@ def suricata4_dns_query(domain, sid, custom_message, reference):
     analyze = "alert dns $HOME_NET any -> any any"
     detect = f'dns_query; content:"{detect_domain}"; nocase; isdataat:!1,relative;'
     detect_subdomains = f'pcre:"{subdomains_regex}";'
-    metadata = f"sid:{sid}; {ref}rev:1;"
+    metadata = f"{ref}sid:{sid}; rev:1;"
 
     rule_string = f"{analyze} ({message} {detect} {detect_subdomains} {metadata})\n"
     return rule_string
@@ -35,7 +35,7 @@ def suricata4_http_host(domain, sid, custom_message, reference):
     analyze = "alert http $HOME_NET any -> $EXTERNAL_NET any"
     filter = "flow:established,to_server;"
     detect = f'content:"{detect_domain}"; http_host; isdataat:!1,relative;'
-    metadata = f"sid:{sid}; {ref}rev:1;"
+    metadata = f"{ref}sid:{sid}; rev:1;"
 
     rule_string = f"{analyze} ({message} {filter} {detect} {metadata})\n"
     return rule_string
@@ -55,7 +55,7 @@ def suricata4_tls_sni(domain, sid, custom_message, reference):
     detect = (
         f'content:"{detect_domain}"; depth:{len(detect_domain)}; isdataat:!1,relative;'
     )
-    metadata = f"sid:{sid}; {ref}rev:1;"
+    metadata = f"{ref}sid:{sid}; rev:1;"
 
-    rule_string = f"{analyze} ({message} {filter} {detect} {metadata})\n"
+    rule_string = f"{analyze} ({message} {filter} {detect} {metadata})"
     return rule_string
