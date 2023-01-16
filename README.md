@@ -43,6 +43,18 @@ One or more of the below is required:
 * **--reason [text]** - Optional: A custom reason to include in each rule's message (ex. "ViperSoftX CnC")
 * **--reference [text]** - Optional: A URL to include as a reference in each rule (ex. a research article)
 
+#### Example Command
+
+```
+python3 quickburn.py --input sample/sampledns.txt --output test-rules --dns --tls
+```
+
+The above uses the sample domains in `sampledns.txt` and:
+
+* Creates a folder `test-rules`,
+* Creates files `snort.rules`, `suricata4.rules`, `suricata5.rules` in the `test-rules` folder
+* Creates rules in each file which detects the domains in `sampledns.txt` in DNS queries and TLS SNI
+
 #### Outputs
 
 The output rules will be sorted by what IDS they support, ex:
