@@ -26,8 +26,8 @@ quickburn is a Python script which uses command line options, and should support
 
 #### Required Arguments
 
-* **--input <file_name>** - The name of the file containing a list of domains, one domain per line
-* **--output <folder_name>** - The name of the folder to output your IDS rules to
+* **--input [file_name]** - The name of the file containing a list of domains, one domain per line
+* **--output [folder_name]** - The name of the folder to output your IDS rules to
 
 #### Generation Flags
 
@@ -39,9 +39,9 @@ One or more of the below is required:
 
 #### Optional Arguments
 
-* **--sid <integer>** - Optional: The rule ID to start numbering incrementally at (default is 1000000, must be between 1000000-2000000)
-* **--reason <text>** - Optional: A custom reason to include in each rule's message (ex. "ViperSoftX CnC")
-* **--reference <text>** - Optional: A URL to include as a reference in each rule (ex. a research article)
+* **--sid [number]** - Optional: The rule ID to start numbering incrementally at (default is 1000000, must be between 1000000-2000000)
+* **--reason [text]** - Optional: A custom reason to include in each rule's message (ex. "ViperSoftX CnC")
+* **--reference [text]** - Optional: A URL to include as a reference in each rule (ex. a research article)
 
 #### Outputs
 
