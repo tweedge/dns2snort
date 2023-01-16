@@ -3,20 +3,20 @@ from src.snort import snort_dns_query, snort_http_host, snort_tls_sni
 from src.suricata4 import suricata4_dns_query, suricata4_http_host, suricata4_tls_sni
 from src.suricata5 import suricata5_dns_query, suricata5_http_host, suricata5_tls_sni
 
-description = """Given a file containing a list of FQDNs, quickly generate Snort rules for those domains.\n
-Brought to you by @da_667, @botnet_hunter, @3XPlo1T2, and tweedge."""
+description = """Given a file containing a list of FQDNs, quickly generate IDS rules for those domains.
+Can generate rules detecting FQDNs in DNS queries, HTTP hosts, or TLS SNI fields."""
 
 parser = argparse.ArgumentParser(description=description)
 
 parser.add_argument(
     "--input",
     required=True,
-    help="The name of the file containing a list of domains, one domain per line.",
+    help="The name of the file containing a list of domains, one domain per line",
 )
 parser.add_argument(
     "--output",
     required=True,
-    help="The name of the folder to output your IPS rules to.",
+    help="The name of the folder to output your IDS rules to",
 )
 parser.add_argument(
     "--sid",
@@ -37,17 +37,17 @@ parser.add_argument(
 parser.add_argument(
     "--dns",
     action="store_true",
-    help="Generate IPS rules to find domains in DNS queries",
+    help="Generate IDS rules to find domains in DNS queries",
 )
 parser.add_argument(
     "--http",
     action="store_true",
-    help="Generate IPS rules to find domains in HTTP host headers",
+    help="Generate IDS rules to find domains in HTTP host headers",
 )
 parser.add_argument(
     "--tls",
     action="store_true",
-    help="Generate IPS rules to find domains in TLS SNI fields",
+    help="Generate IDS rules to find domains in TLS SNI fields",
 )
 args = parser.parse_args()
 

@@ -2,43 +2,65 @@
 
 [![Code Style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
 
-Given a file containing a list of fully qualified DNS domains, generate Snort rules for those domains. Incredibly useful if you are sitting on top of a pile of IOCs, but want an efficiently lazy way to generate Snort signatures for them.
+Given a file containing a list of fully qualified DNS domains, quickburn generates IDS rules which detect those domains (and their subdomains) in DNS queries, the HTTP Host header, or TLS SNI (or all of the above!). quickburn supports Snort, Suricata 4, and Suricata 5, and tries to use the most efficient methods available for each option.
+
+### Why?
+
+If you publish IOCs independently, it's pretty much a crapshoot if those IOCs will get picked up and integrated into security products that can protect people. If you generate and submit signatures to [Emerging Threats](https://rules.emergingthreats.net/) using quickburn, you can contribute useful day-one defenses which are consumed by thousands or millions of networks around the world, such as networks using:
+
+* pfSense and opnSense (if IDS is configured)
+* Ubiquiti security gateways
+* Synology routers
+
+...and many others. quickburn could also introduce more people to contributing to Emerging Threats.
+
+### Usage
+
+quickburn is a Python script which uses command line options, and should support any OS.
+
+```
+% git clone https://github.com/tweedge/quickburn
+% cd quickburn
+% python3 quickburn.py --help
+```
+
+#### Required Arguments
+
+* **--input <file_name>** - The name of the file containing a list of domains, one domain per line
+* **--output <folder_name>** - The name of the folder to output your IDS rules to
+
+#### Generation Flags
+
+One or more of the below is required:
+
+* **--dns** - Generate IDS rules to find domains in DNS queries
+* **--http** - Generate IDS rules to find domains in HTTP host headers
+* **--tls** - Generate IDS rules to find domains in TLS SNI fields
+
+#### Optional Arguments
+
+* **--sid <integer>** - Optional: The rule ID to start numbering incrementally at (default is 1000000, must be between 1000000-2000000)
+* **--reason <text>** - Optional: A custom reason to include in each rule's message (ex. "ViperSoftX CnC")
+* **--reference <text>** - Optional: A URL to include as a reference in each rule (ex. a research article)
+
+#### Outputs
+
+The output rules will be sorted by what IDS they support, ex:
+
+```
+foldername/
+  snort.rules
+  suricata4.rules
+  suricata5.rules
+```
+
+Each output file has one rule per line for that IDS. If you're submitting rules to Emerging Threats, submit all of these to save the ET staff time converting rules between each IDS manually.
 
 ### Kudos
 
-This project is originally by [da667](https://github.com/da667), with contributions from @botnet_hunter, and @3XPlo1T2.
-
-### Example
-
-This script supports TLDs and FQDNs - see the example below, or try the sampledns.txt and sample.rules files provided with this repository.
-
-**Example input:**
-
-```
-.pw
-evilcorp.co
-www.evil.com
-seemstoteslegit.notreally.tk
-stupidlylongsubdomain.lol.wutski.biz
-```
-
-**...becomes:**
-
-```
-alert udp $HOME_NET any -> any 53 (msg:"dns2snort banned DNS domain .pw"; content:"|01|"; offset:2; depth:1; content:"|00 01 00 00 00 00 00|"; distance:1; within:7; content:"|02|pw|00|"; nocase; distance:0; fast_pattern; metadata:service dns; sid:1000000; rev:1;)
-alert udp $HOME_NET any -> any 53 (msg:"dns2snort banned DNS domain evilcorp.co"; content:"|01|"; offset:2; depth:1; content:"|00 01 00 00 00 00 00|"; distance:1; within:7; content:"|08|evilcorp|02|co|00|"; nocase; distance:0; fast_pattern; metadata:service dns; sid:1000001; rev:1;)
-alert udp $HOME_NET any -> any 53 (msg:"dns2snort banned DNS domain www.evil.com"; content:"|01|"; offset:2; depth:1; content:"|00 01 00 00 00 00 00|"; distance:1; within:7; content:"|03|www|04|evil|03|com|00|"; nocase; distance:0; fast_pattern; metadata:service dns; sid:1000002; rev:1;)
-alert udp $HOME_NET any -> any 53 (msg:"dns2snort banned DNS domain seemstoteslegit.notreally.tk"; content:"|01|"; offset:2; depth:1; content:"|00 01 00 00 00 00 00|"; distance:1; within:7; content:"|0F|seemstoteslegit|09|notreally|02|tk|00|"; nocase; distance:0; fast_pattern; metadata:service dns; sid:1000003; rev:1;)
-alert udp $HOME_NET any -> any 53 (msg:"dns2snort banned DNS domain stupidlylongsubdomain.lol.wutski.biz"; content:"|01|"; offset:2; depth:1; content:"|00 01 00 00 00 00 00|"; distance:1; within:7; content:"|15|stupidlylongsubdomain|03|lol|06|wutski|03|biz|00|"; nocase; distance:0; fast_pattern; metadata:service dns; sid:1000004; rev:1;)
-```
-
-These are all properly formatted Snort rules ready to be pushed to a sensor.
+This project is based on [dns2snort](https://github.com/da667/dns2snort), which is originally by [da667](https://github.com/da667) (with contributions from @botnet_hunter and @3XPlo1T2).
 
 ### Notes
 
-* Please note that none of these sample domains are malicious. They are samples for testing only.
-* Some additional changes have been made from da_667's version of dns2snort, these are:
-  * The subdomain limitation has been removed.
-  * There is no longer an argument to allow removing `www.` from domains.
-  * `idstools` now does a basic check on the validity of the produced rule
-  * Custom metadata can be optionally added to the rule
+* Please note that none of the sample domains in `sample/` are malicious. They are samples for testing only.
+* Several changes have been made from da667's dns2snort script. quickburn is not backwards compatile.
