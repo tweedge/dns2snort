@@ -13,7 +13,7 @@ def test_snort_http_host():
     generated_rule = snort_http_host(domain, sid, message, reference)
     assert (
         generated_rule.strip()
-        == 'alert tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS (msg:"Observed Dynamic DNS request (now-dns .top) in HTTP Host"; flow:established,to_server; content:".now-dns.top|0d 0a|"; http_header; fast_pattern; pcre:"/^Host\\x3a\\x20[^\\r\\n]+\.now-dns\.top[\\r\\n]+$/Hmi"; reference:url,raw.githubusercontent.com/MISP/misp-warninglists/main/lists/dynamic-dns/list.json; sid:2042939; rev:1;)'
+        == 'alert tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS (msg:"Observed Dynamic DNS request (now-dns .top) in HTTP Host"; flow:established,to_server; content:".now-dns.top|0d 0a|"; http_header; fast_pattern; pcre:"/^Host\\x3a\\x20[^\\r\\n]+\\.now-dns\\.top[\\r\\n]+$/Hmi"; reference:url,raw.githubusercontent.com/MISP/misp-warninglists/main/lists/dynamic-dns/list.json; sid:2042939; rev:1;)'
     )
 
 
