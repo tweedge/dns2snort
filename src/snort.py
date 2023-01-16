@@ -22,7 +22,7 @@ def snort_dns_query(domain, sid, custom_message, reference):
     detect = f"content:{content}; nocase; distance:0; fast_pattern;"
     metadata = f"{ref}sid:{sid}; rev:1;"
 
-    rule_string = f"{analyze} ({message} {filter} {detect} {metadata})\n"
+    rule_string = f"{analyze} ({message} {filter} {detect} {metadata})"
     return rule_string
 
 
@@ -44,7 +44,7 @@ def snort_http_host(domain, sid, custom_message, reference):
     and_subdomains = f'pcre:"{subdomains_regex}";'
     metadata = f"{ref}sid:{sid}; rev:1;"
 
-    rule_string = f"{analyze} ({message} {detect} {and_subdomains} {metadata})\n"
+    rule_string = f"{analyze} ({message} {detect} {and_subdomains} {metadata})"
     return rule_string
 
 

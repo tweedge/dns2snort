@@ -19,7 +19,7 @@ def suricata4_dns_query(domain, sid, custom_message, reference):
     detect_subdomains = f'pcre:"{subdomains_regex}";'
     metadata = f"{ref}sid:{sid}; rev:1;"
 
-    rule_string = f"{analyze} ({message} {detect} {detect_subdomains} {metadata})\n"
+    rule_string = f"{analyze} ({message} {detect} {detect_subdomains} {metadata})"
     return rule_string
 
 
@@ -37,7 +37,7 @@ def suricata4_http_host(domain, sid, custom_message, reference):
     detect = f'content:"{detect_domain}"; http_host; isdataat:!1,relative;'
     metadata = f"{ref}sid:{sid}; rev:1;"
 
-    rule_string = f"{analyze} ({message} {filter} {detect} {metadata})\n"
+    rule_string = f"{analyze} ({message} {filter} {detect} {metadata})"
     return rule_string
 
 

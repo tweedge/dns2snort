@@ -14,7 +14,7 @@ def suricata5_dns_query(domain, sid, custom_message, reference):
     detect = f'dns.query; dotprefix; content:"{detect_domain}"; nocase; endswith;'
     metadata = f"{ref}sid:{sid}; rev:1;"
 
-    rule_string = f"{analyze} ({message} {detect} {metadata})\n"
+    rule_string = f"{analyze} ({message} {detect} {metadata})"
     return rule_string
 
 
@@ -32,7 +32,7 @@ def suricata5_http_host(domain, sid, custom_message, reference):
     detect = f'content:"{detect_domain}"; endswith;'
     metadata = f"{ref}sid:{sid}; rev:1;"
 
-    rule_string = f"{analyze} ({message} {filter} {detect} {metadata})\n"
+    rule_string = f"{analyze} ({message} {filter} {detect} {metadata})"
     return rule_string
 
 
